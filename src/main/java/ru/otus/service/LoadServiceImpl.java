@@ -13,27 +13,23 @@ import java.util.List;
 
 public class LoadServiceImpl implements LoadService {
 
-    private final String SEPARATOR = ",";
+    private final String separator;
+
+    public LoadServiceImpl(String separator) {
+        this.separator = separator;
+    }
 
     @Override
     public Test load(InputStream stream) {
         List<Question> questions = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
             String line;
-            int j = 0;
+            int j = 1;
             while ((line = reader.readLine()) != null) {
-                String[] array = line.split(SEPARATOR);
-                List<Answer> answerList = new ArrayList<>();
-                for (int i = 1; i < array.length; i++) {
-                    answerList.add(Answer.builder()
-                                    .id(String.valueOf((char) (64 + i)))
-                                    .text(array[i])
-                            .build());
-                }
                 Question question = Question.builder()
                         .id(j)
-                        .text(array[0])
-                        .answers(answerList)
+                        .text(loadText(line))
+                        .answers(loadAnswers(line))
                         .build();
                 questions.add(question);
                 j++;
@@ -44,5 +40,24 @@ public class LoadServiceImpl implements LoadService {
         return Test.builder()
                 .questions(questions)
                 .build();
+    }
+
+    @Override
+    public String loadText(String line) {
+        String[] array = line.split(separator);
+        return array[0];
+    }
+
+    @Override
+    public List<Answer> loadAnswers(String line) {
+        String[] array = line.split(separator);
+        List<Answer> answerList = new ArrayList<>();
+        for (int i = 1; i < array.length; i++) {
+            answerList.add(Answer.builder()
+                    .id(String.valueOf((char) (64 + i)))
+                    .text(array[i])
+                    .build());
+        }
+        return answerList;
     }
 }

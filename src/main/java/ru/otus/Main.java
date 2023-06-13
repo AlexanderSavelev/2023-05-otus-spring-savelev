@@ -2,7 +2,12 @@ package ru.otus;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.otus.model.Test;
-import ru.otus.service.*;
+import ru.otus.service.ReadService;
+import ru.otus.service.ReadServiceImpl;
+import ru.otus.service.LoadService;
+import ru.otus.service.LoadServiceImpl;
+import ru.otus.service.LauncherService;
+import ru.otus.service.LauncherServiceImpl;
 
 public class Main {
     public static void main(String[] args) {

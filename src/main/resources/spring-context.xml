@@ -8,7 +8,9 @@
         <constructor-arg index="0" type="String" value="test.csv"/>
     </bean>
 
-    <bean id="loadService" class="ru.otus.service.LoadServiceImpl"/>
+    <bean id="loadService" class="ru.otus.service.LoadServiceImpl">
+        <constructor-arg index="0" type="String" value=","/>
+    </bean>
 
     <bean id="launcherService" class="ru.otus.service.LauncherServiceImpl"/>
 </beans>
