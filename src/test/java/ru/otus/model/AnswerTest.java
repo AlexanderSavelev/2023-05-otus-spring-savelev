@@ -13,9 +13,11 @@ class AnswerTest {
 
     private final String text = "answer";
 
+    private final boolean isRight = true;
+
     @BeforeEach
     void setUp() {
-        answer = new Answer(id, text);
+        answer = new Answer(id, text, isRight);
     }
 
     @Test
@@ -26,6 +28,11 @@ class AnswerTest {
     @Test
     void getText() {
         assertEquals(text, answer.getText());
+    }
+
+    @Test
+    void getIsRight() {
+        assertEquals(isRight, answer.isRight());
     }
 
     @Test
@@ -43,11 +50,9 @@ class AnswerTest {
     }
 
     @Test
-    void builder() {
-        Answer newAnswer = Answer.builder()
-                .id(id)
-                .text(text)
-                .build();
-        assertEquals(answer, newAnswer);
+    void setRight() {
+        boolean isFalse = false;
+        answer.setRight(isFalse);
+        assertEquals(isFalse, answer.isRight());
     }
 }

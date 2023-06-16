@@ -4,13 +4,18 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="readService" class="ru.otus.service.ReadServiceImpl">
-        <constructor-arg index="0" type="String" value="test.csv"/>
-    </bean>
+    <bean id="fileReader" class="ru.otus.utils.FileReader"/>
 
-    <bean id="loadService" class="ru.otus.service.LoadServiceImpl">
+    <bean id="testDao" class="ru.otus.dao.TestDaoImpl">
         <constructor-arg index="0" type="String" value=","/>
+        <constructor-arg index="1" type="String" value="test.csv"/>
+        <constructor-arg index="2" ref="fileReader"/>
     </bean>
 
-    <bean id="launcherService" class="ru.otus.service.LauncherServiceImpl"/>
+    <bean id="outputService" class="ru.otus.service.OutputServiceImpl"/>
+
+    <bean id="launcherService" class="ru.otus.service.LauncherServiceImpl">
+        <constructor-arg index="0" ref="testDao"/>
+        <constructor-arg index="1" ref="outputService"/>
+    </bean>
 </beans>

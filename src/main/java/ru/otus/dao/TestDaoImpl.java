@@ -1,8 +1,9 @@
-package ru.otus.service;
+package ru.otus.dao;
 
 import ru.otus.model.Answer;
 import ru.otus.model.Question;
 import ru.otus.model.Test;
+import ru.otus.utils.FileReader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,52 +12,50 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoadServiceImpl implements LoadService {
+public class TestDaoImpl implements TestDao {
 
     private final String separator;
 
-    public LoadServiceImpl(String separator) {
+    private final String fileName;
+
+    private final FileReader fileReader;
+
+    public TestDaoImpl(String separator, String fileName, FileReader fileReader) {
         this.separator = separator;
+        this.fileName = fileName;
+        this.fileReader = fileReader;
     }
 
     @Override
-    public Test load(InputStream stream) {
+    public Test load() {
         List<Question> questions = new ArrayList<>();
+        InputStream stream = fileReader.read(fileName);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
             String line;
             int j = 1;
             while ((line = reader.readLine()) != null) {
-                Question question = Question.builder()
-                        .id(j)
-                        .text(loadText(line))
-                        .answers(loadAnswers(line))
-                        .build();
+                Question question = new Question(j, loadText(line), loadAnswers(line));
                 questions.add(question);
                 j++;
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return Test.builder()
-                .questions(questions)
-                .build();
+        return new Test(questions);
     }
 
-    @Override
-    public String loadText(String line) {
+    private String loadText(String line) {
         String[] array = line.split(separator);
         return array[0];
     }
 
-    @Override
-    public List<Answer> loadAnswers(String line) {
+    private List<Answer> loadAnswers(String line) {
         String[] array = line.split(separator);
         List<Answer> answerList = new ArrayList<>();
-        for (int i = 1; i < array.length; i++) {
-            answerList.add(Answer.builder()
-                    .id(String.valueOf((char) (64 + i)))
-                    .text(array[i])
-                    .build());
+        for (int i = 1; i < array.length - 1; i++) {
+            String answerId = String.valueOf((char) (64 + i));
+            boolean isRight = answerId.equals(array[array.length - 1]);
+            answerList.add(new Answer(answerId, array[i], isRight));
         }
         return answerList;
     }

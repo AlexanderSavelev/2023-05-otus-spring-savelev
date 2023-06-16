@@ -15,7 +15,7 @@ class QuestionTest {
 
     private final String text = "question";
 
-    private final List<Answer> answers = List.of(new Answer("A", "answer_0"), new Answer("B", "answer_1"));
+    private final List<Answer> answers = List.of(new Answer("A", "answer_0", true), new Answer("B", "answer_1", false));
 
     @BeforeEach
     void setUp() {
@@ -53,18 +53,8 @@ class QuestionTest {
 
     @Test
     void setAnswers() {
-        List<Answer> newAnswers = List.of(new Answer("C", "answer_2"), new Answer("D", "answer_3"));
+        List<Answer> newAnswers = List.of(new Answer("C", "answer_2", true), new Answer("D", "answer_3", false));
         question.setAnswers(newAnswers);
         assertEquals(newAnswers, question.getAnswers());
-    }
-
-    @Test
-    void builder() {
-        Question newQuestion = Question.builder()
-                .id(id)
-                .text(text)
-                .answers(answers)
-                .build();
-        assertEquals(question, newQuestion);
     }
 }
