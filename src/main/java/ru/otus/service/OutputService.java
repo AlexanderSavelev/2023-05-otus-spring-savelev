@@ -2,5 +2,7 @@ package ru.otus.service;
 
 public interface OutputService {
 
-    void outputString(String string);
+    void output(String string);
+
+    void outputEmptyLine();
 }

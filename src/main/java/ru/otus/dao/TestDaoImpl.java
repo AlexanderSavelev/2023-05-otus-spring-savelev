@@ -3,7 +3,6 @@ package ru.otus.dao;
 import ru.otus.model.Answer;
 import ru.otus.model.Question;
 import ru.otus.model.Test;
-import ru.otus.utils.FileReader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,18 +17,18 @@ public class TestDaoImpl implements TestDao {
 
     private final String fileName;
 
-    private final FileReader fileReader;
+    private final int passPercentage;
 
-    public TestDaoImpl(String separator, String fileName, FileReader fileReader) {
+    public TestDaoImpl(String separator, String fileName, int passPercentage) {
         this.separator = separator;
         this.fileName = fileName;
-        this.fileReader = fileReader;
+        this.passPercentage = passPercentage;
     }
 
     @Override
     public Test load() {
         List<Question> questions = new ArrayList<>();
-        InputStream stream = fileReader.read(fileName);
+        InputStream stream = readFile(fileName);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
             String line;
             int j = 1;
@@ -41,7 +40,12 @@ public class TestDaoImpl implements TestDao {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new Test(questions);
+        return new Test(questions, passPercentage);
+    }
+
+    private InputStream readFile(String fileName) {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        return classloader.getResourceAsStream(fileName);
     }
 
     private String loadText(String line) {

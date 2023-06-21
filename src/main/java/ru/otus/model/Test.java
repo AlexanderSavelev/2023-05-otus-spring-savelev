@@ -3,16 +3,33 @@ package ru.otus.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
 public class Test {
 
-    private List<Question> questions;
+    private final List<Question> questions;
 
-    public Test(List<Question> questions) {
+    private final int passPercentage;
+
+    public Test(List<Question> questions, int passPercentage) {
         this.questions = questions;
+        this.passPercentage = passPercentage;
+    }
+
+    public Map<Integer, String> getRightAnswers() {
+        Map<Integer, String> rightAnswers = new HashMap<>();
+        for (Question question : questions) {
+            for (Answer answer : question.getAnswers()) {
+                if (answer.isRight()) {
+                    rightAnswers.put(question.getId(), answer.getId());
+                }
+            }
+        }
+        return rightAnswers;
     }
 
     @Override
