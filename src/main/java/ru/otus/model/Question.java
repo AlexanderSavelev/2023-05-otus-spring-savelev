@@ -22,6 +22,11 @@ public class Question {
     }
 
     @Override
+    public String toString() {
+        return id + ". " + text;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
