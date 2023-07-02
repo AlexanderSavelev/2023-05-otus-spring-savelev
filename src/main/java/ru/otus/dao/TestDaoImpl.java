@@ -1,5 +1,7 @@
 package ru.otus.dao;
 
+import org.springframework.stereotype.Repository;
+import ru.otus.config.TestProperties;
 import ru.otus.model.Answer;
 import ru.otus.model.Question;
 import ru.otus.model.Test;
@@ -11,6 +13,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class TestDaoImpl implements TestDao {
 
     private final String separator;
@@ -19,10 +22,10 @@ public class TestDaoImpl implements TestDao {
 
     private final int passPercentage;
 
-    public TestDaoImpl(String separator, String fileName, int passPercentage) {
-        this.separator = separator;
-        this.fileName = fileName;
-        this.passPercentage = passPercentage;
+    public TestDaoImpl(TestProperties testProperties) {
+        this.separator = testProperties.getSeparator();
+        this.fileName = testProperties.getName();
+        this.passPercentage = testProperties.getPass();
     }
 
     @Override
