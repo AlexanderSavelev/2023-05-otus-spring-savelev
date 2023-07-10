@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 import ru.otus.service.LauncherService;
 
 @Component
-public class RunAfterStartup {
+public class StartUpRunner {
 
     private final LauncherService launcherService;
 
-    public RunAfterStartup(LauncherService launcherService) {
+    public StartUpRunner(LauncherService launcherService) {
         this.launcherService = launcherService;
     }
 

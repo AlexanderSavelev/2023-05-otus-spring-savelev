@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.context.MessageSource;
+import ru.otus.config.LocaleProperties;
+import ru.otus.config.TestApplicationConfiguration;
 import ru.otus.config.TestProperties;
 import ru.otus.dao.TestDao;
 import ru.otus.model.Answer;
@@ -25,7 +27,7 @@ class LauncherServiceImplTest {
 
     private MessageSource messageSource;
 
-    private TestProperties testProperties;
+    private TestApplicationConfiguration testApplicationConfiguration;
 
     private LauncherServiceImpl launcherService;
 
@@ -54,8 +56,8 @@ class LauncherServiceImplTest {
         testDao = Mockito.mock(TestDao.class);
         ioService = Mockito.mock(IOService.class);
         messageSource = Mockito.mock(MessageSource.class);
-        testProperties = Mockito.mock(TestProperties.class);
-        launcherService = new LauncherServiceImpl(testDao, ioService, messageSource, testProperties);
+        testApplicationConfiguration = Mockito.mock(TestApplicationConfiguration.class);
+        launcherService = new LauncherServiceImpl(testDao, ioService, messageSource, testApplicationConfiguration);
         captor = ArgumentCaptor.forClass(String.class);
     }
 
@@ -64,24 +66,24 @@ class LauncherServiceImplTest {
         List<String> output = createOutput(test);
         when(testDao.load())
                 .thenReturn(test);
-        when(testProperties.getLocale())
+        when(testApplicationConfiguration.getLocale())
                 .thenReturn(Locale.ENGLISH);
-        when(messageSource.getMessage("user.first.name", null, testProperties.getLocale()))
+        when(messageSource.getMessage("user.first.name", null, testApplicationConfiguration.getLocale()))
                 .thenReturn("Please enter first name");
-        when(messageSource.getMessage("user.last.name", null, testProperties.getLocale()))
+        when(messageSource.getMessage("user.last.name", null, testApplicationConfiguration.getLocale()))
                 .thenReturn("Please enter last name");
-        when(messageSource.getMessage("press.any.key", null, testProperties.getLocale()))
+        when(messageSource.getMessage("press.any.key", null, testApplicationConfiguration.getLocale()))
                 .thenReturn("Press ENTER key to start test");
-        when(messageSource.getMessage("choose.answer", null, testProperties.getLocale()))
+        when(messageSource.getMessage("choose.answer", null, testApplicationConfiguration.getLocale()))
                 .thenReturn("Choose you answer");
-        when(messageSource.getMessage("test.result", new String[]{user.toString(), String.valueOf(result.getResults())}, testProperties.getLocale()))
+        when(messageSource.getMessage("test.result", new String[]{user.toString(), String.valueOf(result.getResults())}, testApplicationConfiguration.getLocale()))
                 .thenReturn("Result:\n" + user + " has " + result.getResults() +
                         "% correct answers");
         if (result.getResults() >= test.getPassPercentage()) {
-            when(messageSource.getMessage("test.passed", null, testProperties.getLocale()))
+            when(messageSource.getMessage("test.passed", null, testApplicationConfiguration.getLocale()))
                     .thenReturn("Test passed!");
         } else {
-            when(messageSource.getMessage("test.passed", null, testProperties.getLocale()))
+            when(messageSource.getMessage("test.passed", null, testApplicationConfiguration.getLocale()))
                     .thenReturn("Test not passed!");
         }
         when(ioService.input())

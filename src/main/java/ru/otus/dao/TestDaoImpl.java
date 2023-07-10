@@ -1,6 +1,7 @@
 package ru.otus.dao;
 
 import org.springframework.stereotype.Repository;
+import ru.otus.config.TestApplicationConfiguration;
 import ru.otus.config.TestProperties;
 import ru.otus.model.Answer;
 import ru.otus.model.Question;
@@ -16,22 +17,16 @@ import java.util.List;
 @Repository
 public class TestDaoImpl implements TestDao {
 
-    private final String separator;
+    private final TestProperties testProperties;
 
-    private final String fileName;
-
-    private final int passPercentage;
-
-    public TestDaoImpl(TestProperties testProperties) {
-        this.separator = testProperties.getSeparator();
-        this.fileName = testProperties.getName();
-        this.passPercentage = testProperties.getPass();
+    public TestDaoImpl(TestApplicationConfiguration testApplicationConfiguration) {
+        this.testProperties = testApplicationConfiguration;
     }
 
     @Override
     public Test load() {
         List<Question> questions = new ArrayList<>();
-        InputStream stream = readFile(fileName);
+        InputStream stream = readFile(testProperties.getName());
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
             String line;
             int j = 1;
@@ -43,7 +38,7 @@ public class TestDaoImpl implements TestDao {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new Test(questions, passPercentage);
+        return new Test(questions, testProperties.getPass());
     }
 
     private InputStream readFile(String fileName) {
@@ -52,12 +47,12 @@ public class TestDaoImpl implements TestDao {
     }
 
     private String loadText(String line) {
-        String[] array = line.split(separator);
+        String[] array = line.split(testProperties.getSeparator());
         return array[0];
     }
 
     private List<Answer> loadAnswers(String line) {
-        String[] array = line.split(separator);
+        String[] array = line.split(testProperties.getSeparator());
         List<Answer> answerList = new ArrayList<>();
         for (int i = 1; i < array.length - 1; i++) {
             String answerId = String.valueOf((char) (64 + i));
