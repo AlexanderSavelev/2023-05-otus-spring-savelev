@@ -4,10 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.context.MessageSource;
-import ru.otus.config.LocaleProperties;
-import ru.otus.config.TestApplicationConfiguration;
-import ru.otus.config.TestProperties;
 import ru.otus.dao.TestDao;
 import ru.otus.model.Answer;
 import ru.otus.model.Question;
@@ -17,6 +13,7 @@ import ru.otus.model.User;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class LauncherServiceImplTest {
@@ -24,10 +21,6 @@ class LauncherServiceImplTest {
     private TestDao testDao;
 
     private IOService ioService;
-
-    private MessageSource messageSource;
-
-    private TestApplicationConfiguration testApplicationConfiguration;
 
     private LauncherServiceImpl launcherService;
 
@@ -38,6 +31,8 @@ class LauncherServiceImplTest {
     private Map<Integer, String> usersAnswers;
 
     private Result result;
+
+    private LocaleService localeService;
 
     private ArgumentCaptor<String> captor;
 
@@ -55,9 +50,8 @@ class LauncherServiceImplTest {
         result = new Result(test, user);
         testDao = Mockito.mock(TestDao.class);
         ioService = Mockito.mock(IOService.class);
-        messageSource = Mockito.mock(MessageSource.class);
-        testApplicationConfiguration = Mockito.mock(TestApplicationConfiguration.class);
-        launcherService = new LauncherServiceImpl(testDao, ioService, messageSource, testApplicationConfiguration);
+        localeService = Mockito.mock(LocaleService.class);
+        launcherService = new LauncherServiceImpl(testDao, ioService, localeService);
         captor = ArgumentCaptor.forClass(String.class);
     }
 
@@ -66,24 +60,22 @@ class LauncherServiceImplTest {
         List<String> output = createOutput(test);
         when(testDao.load())
                 .thenReturn(test);
-        when(testApplicationConfiguration.getLocale())
-                .thenReturn(Locale.ENGLISH);
-        when(messageSource.getMessage("user.first.name", null, testApplicationConfiguration.getLocale()))
+        when(localeService.askFirstName())
                 .thenReturn("Please enter first name");
-        when(messageSource.getMessage("user.last.name", null, testApplicationConfiguration.getLocale()))
+        when(localeService.askLastName())
                 .thenReturn("Please enter last name");
-        when(messageSource.getMessage("press.any.key", null, testApplicationConfiguration.getLocale()))
+        when(localeService.getStartMessage())
                 .thenReturn("Press ENTER key to start test");
-        when(messageSource.getMessage("choose.answer", null, testApplicationConfiguration.getLocale()))
+        when(localeService.getChooseQuestionMessage())
                 .thenReturn("Choose you answer");
-        when(messageSource.getMessage("test.result", new String[]{user.toString(), String.valueOf(result.getResults())}, testApplicationConfiguration.getLocale()))
+        when(localeService.getTestResult(any(Result.class), any(User.class)))
                 .thenReturn("Result:\n" + user + " has " + result.getResults() +
                         "% correct answers");
         if (result.getResults() >= test.getPassPercentage()) {
-            when(messageSource.getMessage("test.passed", null, testApplicationConfiguration.getLocale()))
+            when(localeService.getTestPassedMessage())
                     .thenReturn("Test passed!");
         } else {
-            when(messageSource.getMessage("test.passed", null, testApplicationConfiguration.getLocale()))
+            when(localeService.getTestNotPassedQuestion())
                     .thenReturn("Test not passed!");
         }
         when(ioService.input())
