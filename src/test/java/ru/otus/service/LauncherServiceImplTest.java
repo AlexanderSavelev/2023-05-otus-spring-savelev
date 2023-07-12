@@ -60,22 +60,23 @@ class LauncherServiceImplTest {
         List<String> output = createOutput(test);
         when(testDao.load())
                 .thenReturn(test);
-        when(localeService.askFirstName())
+        when(localeService.getMessage("user.first.name", null))
                 .thenReturn("Please enter first name");
-        when(localeService.askLastName())
+        when(localeService.getMessage("user.last.name", null))
                 .thenReturn("Please enter last name");
-        when(localeService.getStartMessage())
+        when(localeService.getMessage("press.any.key", null))
                 .thenReturn("Press ENTER key to start test");
-        when(localeService.getChooseQuestionMessage())
+        when(localeService.getMessage("choose.answer", null))
                 .thenReturn("Choose you answer");
-        when(localeService.getTestResult(any(Result.class), any(User.class)))
+        when(localeService.getMessage("test.result", user.toString(),
+                String.valueOf(result.getResults())))
                 .thenReturn("Result:\n" + user + " has " + result.getResults() +
                         "% correct answers");
         if (result.getResults() >= test.getPassPercentage()) {
-            when(localeService.getTestPassedMessage())
+            when(localeService.getMessage("test.passed", null))
                     .thenReturn("Test passed!");
         } else {
-            when(localeService.getTestNotPassedQuestion())
+            when(localeService.getMessage("test.not.passed", null))
                     .thenReturn("Test not passed!");
         }
         when(ioService.input())

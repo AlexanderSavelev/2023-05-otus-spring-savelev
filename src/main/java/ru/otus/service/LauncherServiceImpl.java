@@ -42,29 +42,30 @@ public class LauncherServiceImpl implements LauncherService {
     }
 
     private User getUser() {
-        ioService.output(localeService.askFirstName());
+        ioService.output(localeService.getMessage("user.first.name", null));
         String firstName = ioService.input();
-        ioService.output(localeService.askLastName());
+        ioService.output(localeService.getMessage("user.last.name", null));
         String lastName = ioService.input();
         return new User(firstName, lastName);
     }
 
     private void startTest() {
         ioService.outputEmptyLine();
-        ioService.output(localeService.getStartMessage());
+        ioService.output(localeService.getMessage("press.any.key", null));
         ioService.input();
     }
 
     private void getAnswer(Result result, Question question) {
-        ioService.output(localeService.getChooseQuestionMessage());
+        ioService.output(localeService.getMessage("choose.answer", null));
         result.applyAnswer(question.getId(), ioService.input());
         ioService.outputEmptyLine();
     }
 
     private void printResult(User user, Test test, Result result) {
-        ioService.output(localeService.getTestResult(result, user));
+        ioService.output(localeService.getMessage("test.result", user.toString(),
+                String.valueOf(result.getResults())));
         ioService.output(result.getResults() >= test.getPassPercentage() ?
-                localeService.getTestPassedMessage() :
-                localeService.getTestNotPassedQuestion());
+                localeService.getMessage("test.passed", null) :
+                localeService.getMessage("test.not.passed", null));
     }
 }

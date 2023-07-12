@@ -1,7 +1,6 @@
 package ru.otus.dao;
 
 import org.springframework.stereotype.Repository;
-import ru.otus.config.TestApplicationConfiguration;
 import ru.otus.config.TestProperties;
 import ru.otus.model.Answer;
 import ru.otus.model.Question;
@@ -19,8 +18,8 @@ public class TestDaoImpl implements TestDao {
 
     private final TestProperties testProperties;
 
-    public TestDaoImpl(TestApplicationConfiguration testApplicationConfiguration) {
-        this.testProperties = testApplicationConfiguration;
+    public TestDaoImpl(TestProperties testProperties) {
+        this.testProperties = testProperties;
     }
 
     @Override

@@ -7,7 +7,7 @@ spring:
 banner:
   location: 'classpath:banner.txt'
 test:
-  locale: ru_RU
+  locale: en_EN
   separator: ','
   name: 'test_${test.locale}.csv'
   pass: 50
