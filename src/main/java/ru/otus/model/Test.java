@@ -1,23 +1,34 @@
 package ru.otus.model;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Getter
-@Setter
 public class Test {
 
     private final List<Question> questions;
 
     private final int passPercentage;
 
+    private int questionCounter;
+
     public Test(List<Question> questions, int passPercentage) {
         this.questions = questions;
         this.passPercentage = passPercentage;
+        this.questionCounter = 0;
+    }
+
+    public boolean hasNextQuestion() {
+        return (questionCounter + 1) <= questions.size();
+    }
+
+    public Question getNextQuestion() {
+        Question question = questions.get(questionCounter);
+        questionCounter++;
+        return question;
     }
 
     public Map<Integer, String> getRightAnswers() {

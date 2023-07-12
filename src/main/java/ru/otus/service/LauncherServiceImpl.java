@@ -1,59 +1,71 @@
 package ru.otus.service;
 
+import org.springframework.stereotype.Service;
 import ru.otus.dao.TestDao;
-import ru.otus.model.User;
 import ru.otus.model.Question;
-import ru.otus.model.Answer;
-import ru.otus.model.Test;
 import ru.otus.model.Result;
+import ru.otus.model.Test;
+import ru.otus.model.User;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+@Service
 public class LauncherServiceImpl implements LauncherService {
 
     private final TestDao testDao;
 
     private final IOService ioService;
 
-    public LauncherServiceImpl(TestDao testDao, IOService ioService) {
+    private final LocaleService localeService;
+
+    public LauncherServiceImpl(TestDao testDao,
+                               IOService ioService,
+                               LocaleService localeService) {
         this.testDao = testDao;
         this.ioService = ioService;
+        this.localeService = localeService;
     }
 
     @Override
     public void launch() {
         User user = getUser();
-        ioService.outputEmptyLine();
-        ioService.output("Press ENTER key to start test");
-        ioService.input();
-
-        Map<Integer, String> userAnswers = new HashMap<>();
-
         Test test = testDao.load();
-        List<Question> questions = test.getQuestions();
-        for (Question question : questions) {
+        startTest();
+        Result result = new Result(test, user);
+        while (test.hasNextQuestion()) {
+            Question question = test.getNextQuestion();
             ioService.output(question.toString());
-            for (Answer answer : question.getAnswers()) {
-                ioService.output(answer.toString());
+            while (question.hasNextAnswer()) {
+                ioService.output(question.getNextAnswer().toString());
             }
-            ioService.output("Choose you answer");
-            userAnswers.put(question.getId(), ioService.input());
-            ioService.outputEmptyLine();
+            getAnswer(result, question);
         }
-
-        Result result = new Result(test, user, userAnswers);
-        ioService.output("Result:\n" + user + " has " + result.getResults() +
-                "% correct answers");
-        ioService.output(result.getResults() >= test.getPassPercentage() ? "Test passed!" : "Test not passed!");
+        printResult(user, test, result);
     }
 
     private User getUser() {
-        ioService.output("Please enter first name");
+        ioService.output(localeService.getMessage("user.first.name", null));
         String firstName = ioService.input();
-        ioService.output("Please enter last name");
+        ioService.output(localeService.getMessage("user.last.name", null));
         String lastName = ioService.input();
         return new User(firstName, lastName);
+    }
+
+    private void startTest() {
+        ioService.outputEmptyLine();
+        ioService.output(localeService.getMessage("press.any.key", null));
+        ioService.input();
+    }
+
+    private void getAnswer(Result result, Question question) {
+        ioService.output(localeService.getMessage("choose.answer", null));
+        result.applyAnswer(question.getId(), ioService.input());
+        ioService.outputEmptyLine();
+    }
+
+    private void printResult(User user, Test test, Result result) {
+        ioService.output(localeService.getMessage("test.result", user.toString(),
+                String.valueOf(result.getResults())));
+        ioService.output(result.getResults() >= test.getPassPercentage() ?
+                localeService.getMessage("test.passed", null) :
+                localeService.getMessage("test.not.passed", null));
     }
 }

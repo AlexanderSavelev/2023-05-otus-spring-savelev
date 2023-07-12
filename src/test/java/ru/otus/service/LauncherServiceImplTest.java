@@ -10,12 +10,10 @@ import ru.otus.model.Question;
 import ru.otus.model.Result;
 import ru.otus.model.User;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class LauncherServiceImplTest {
@@ -34,6 +32,8 @@ class LauncherServiceImplTest {
 
     private Result result;
 
+    private LocaleService localeService;
+
     private ArgumentCaptor<String> captor;
 
     @BeforeEach
@@ -47,10 +47,11 @@ class LauncherServiceImplTest {
         user = new User("First Name", "Last Name");
         usersAnswers = Map.of(firstQuestion.getId(), firstQuestion.getAnswers().get(0).getId(),
                 secondQuestion.getId(), secondQuestion.getAnswers().get(0).getId());
-        result = new Result(test, user, usersAnswers);
+        result = new Result(test, user);
         testDao = Mockito.mock(TestDao.class);
         ioService = Mockito.mock(IOService.class);
-        launcherService = new LauncherServiceImpl(testDao, ioService);
+        localeService = Mockito.mock(LocaleService.class);
+        launcherService = new LauncherServiceImpl(testDao, ioService, localeService);
         captor = ArgumentCaptor.forClass(String.class);
     }
 
@@ -59,6 +60,25 @@ class LauncherServiceImplTest {
         List<String> output = createOutput(test);
         when(testDao.load())
                 .thenReturn(test);
+        when(localeService.getMessage("user.first.name", null))
+                .thenReturn("Please enter first name");
+        when(localeService.getMessage("user.last.name", null))
+                .thenReturn("Please enter last name");
+        when(localeService.getMessage("press.any.key", null))
+                .thenReturn("Press ENTER key to start test");
+        when(localeService.getMessage("choose.answer", null))
+                .thenReturn("Choose you answer");
+        when(localeService.getMessage("test.result", user.toString(),
+                String.valueOf(result.getResults())))
+                .thenReturn("Result:\n" + user + " has " + result.getResults() +
+                        "% correct answers");
+        if (result.getResults() >= test.getPassPercentage()) {
+            when(localeService.getMessage("test.passed", null))
+                    .thenReturn("Test passed!");
+        } else {
+            when(localeService.getMessage("test.not.passed", null))
+                    .thenReturn("Test not passed!");
+        }
         when(ioService.input())
                 .thenReturn(user.getFirstName())
                 .thenReturn(user.getLastName())
@@ -91,6 +111,7 @@ class LauncherServiceImplTest {
             }
             output.add("Choose you answer");
             output.add(null);
+            result.applyAnswer(question.getId(), usersAnswers.get(question.getId()));
         }
         output.add("Result:\n" + user + " has " + result.getResults() +
                 "% correct answers");

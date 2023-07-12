@@ -1,24 +1,35 @@
 package ru.otus.model;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-@Setter
 public class Question {
 
-    private int id;
+    private final int id;
 
-    private String text;
+    private final String text;
 
-    private List<Answer> answers;
+    private final List<Answer> answers;
+
+    private int currentAnswer;
 
     public Question(int id, String text, List<Answer> answers) {
         this.id = id;
         this.text = text;
         this.answers = answers;
+        this.currentAnswer = 0;
+    }
+
+    public boolean hasNextAnswer() {
+        return (currentAnswer + 1) <= answers.size();
+    }
+
+    public Answer getNextAnswer() {
+        Answer answer = answers.get(currentAnswer);
+        currentAnswer++;
+        return answer;
     }
 
     @Override
